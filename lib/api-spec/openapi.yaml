@@ -1,22 +1,32 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: DigitPro Platform API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: user
+    description: User management
+  - name: coins
+    description: Coin management
+  - name: templates
+    description: Website templates
+  - name: phones
+    description: Virtual phone numbers
+  - name: transfers
+    description: Bank transfer simulations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +34,379 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /coins/balance:
+    get:
+      operationId: getCoinBalance
+      tags: [coins]
+      summary: Get user coin balance
+      responses:
+        "200":
+          description: Coin balance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoinBalance"
+
+  /coins/packages:
+    get:
+      operationId: getCoinPackages
+      tags: [coins]
+      summary: Get available coin packages
+      responses:
+        "200":
+          description: List of coin packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoinPackage"
+
+  /coins/topup:
+    post:
+      operationId: topupCoins
+      tags: [coins]
+      summary: Initiate coin top-up
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopupRequest"
+      responses:
+        "200":
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopupResponse"
+
+  /coins/transactions:
+    get:
+      operationId: getCoinTransactions
+      tags: [coins]
+      summary: Get coin transaction history
+      responses:
+        "200":
+          description: Transaction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CoinTransaction"
+
+  /templates:
+    get:
+      operationId: getTemplates
+      tags: [templates]
+      summary: Get website templates
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WebTemplate"
+
+  /templates/{id}:
+    get:
+      operationId: getTemplate
+      tags: [templates]
+      summary: Get a template by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebTemplate"
+
+  /templates/create:
+    post:
+      operationId: createWebsite
+      tags: [templates]
+      summary: Create a website from a template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWebsiteRequest"
+      responses:
+        "201":
+          description: Website created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Website"
+
+  /websites:
+    get:
+      operationId: getMyWebsites
+      tags: [templates]
+      summary: Get user's websites
+      responses:
+        "200":
+          description: List of websites
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Website"
+
+  /phones/available:
+    get:
+      operationId: getAvailablePhones
+      tags: [phones]
+      summary: Get available phone numbers
+      parameters:
+        - name: service
+          in: query
+          schema:
+            type: string
+        - name: country
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Available numbers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PhoneNumber"
+
+  /phones/purchase:
+    post:
+      operationId: purchasePhone
+      tags: [phones]
+      summary: Purchase a phone number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchasePhoneRequest"
+      responses:
+        "201":
+          description: Phone purchased
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchasedPhone"
+
+  /phones/my:
+    get:
+      operationId: getMyPhones
+      tags: [phones]
+      summary: Get user's purchased phones
+      responses:
+        "200":
+          description: User's phones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PurchasedPhone"
+
+  /transfers:
+    get:
+      operationId: getMyTransfers
+      tags: [transfers]
+      summary: Get user's transfer simulations
+      responses:
+        "200":
+          description: List of transfers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transfer"
+
+    post:
+      operationId: createTransfer
+      tags: [transfers]
+      summary: Create a transfer simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransferRequest"
+      responses:
+        "201":
+          description: Transfer created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transfer"
+
+  /transfers/{id}:
+    get:
+      operationId: getTransfer
+      tags: [transfers]
+      summary: Get a transfer by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Transfer details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transfer"
+
+  /transfers/{id}/pdf:
+    get:
+      operationId: getTransferPdf
+      tags: [transfers]
+      summary: Download transfer PDF
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: PDF file
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /transfers/track/{trackingCode}:
+    get:
+      operationId: trackTransfer
+      tags: [transfers]
+      summary: Track a transfer by tracking code (public)
+      parameters:
+        - name: trackingCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Transfer tracking info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransferTracking"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +417,489 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        firstName:
+          type: string
+        lastName:
+          type: string
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required:
+        - user
+        - token
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        coinBalance:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - coinBalance
+        - createdAt
+
+    CoinBalance:
+      type: object
+      properties:
+        balance:
+          type: integer
+        currency:
+          type: string
+      required:
+        - balance
+        - currency
+
+    CoinPackage:
+      type: object
+      properties:
+        id:
+          type: string
+        coins:
+          type: integer
+        priceXOF:
+          type: number
+        priceUSD:
+          type: number
+        popular:
+          type: boolean
+        bonus:
+          type: integer
+      required:
+        - id
+        - coins
+        - priceXOF
+        - priceUSD
+        - popular
+
+    TopupRequest:
+      type: object
+      properties:
+        packageId:
+          type: string
+        paymentMethod:
+          type: string
+          enum: [crypto, mtn_momo, moov_money]
+      required:
+        - packageId
+        - paymentMethod
+
+    TopupResponse:
+      type: object
+      properties:
+        paymentUrl:
+          type: string
+        orderId:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+      required:
+        - paymentUrl
+        - orderId
+        - amount
+        - currency
+
+    CoinTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [credit, debit]
+        amount:
+          type: integer
+        description:
+          type: string
+        service:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - type
+        - amount
+        - description
+        - createdAt
+
+    WebTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        previewImage:
+          type: string
+        coinCost:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        featured:
+          type: boolean
+      required:
+        - id
+        - name
+        - category
+        - description
+        - previewImage
+        - coinCost
+        - tags
+        - featured
+
+    CreateWebsiteRequest:
+      type: object
+      properties:
+        templateId:
+          type: string
+        siteName:
+          type: string
+        tagline:
+          type: string
+        logoUrl:
+          type: string
+        primaryColor:
+          type: string
+        customizations:
+          type: object
+          additionalProperties: true
+      required:
+        - templateId
+        - siteName
+
+    Website:
+      type: object
+      properties:
+        id:
+          type: string
+        siteName:
+          type: string
+        templateId:
+          type: string
+        templateName:
+          type: string
+        url:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, pending]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - siteName
+        - templateId
+        - templateName
+        - url
+        - status
+        - createdAt
+
+    PhoneNumber:
+      type: object
+      properties:
+        id:
+          type: string
+        number:
+          type: string
+        country:
+          type: string
+        countryCode:
+          type: string
+        services:
+          type: array
+          items:
+            type: string
+        coinCost:
+          type: integer
+        durationDays:
+          type: integer
+      required:
+        - id
+        - number
+        - country
+        - countryCode
+        - services
+        - coinCost
+        - durationDays
+
+    PurchasePhoneRequest:
+      type: object
+      properties:
+        phoneId:
+          type: string
+        service:
+          type: string
+      required:
+        - phoneId
+        - service
+
+    PurchasedPhone:
+      type: object
+      properties:
+        id:
+          type: string
+        number:
+          type: string
+        country:
+          type: string
+        service:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        smsCode:
+          type: string
+        status:
+          type: string
+          enum: [active, expired, used]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - number
+        - country
+        - service
+        - expiresAt
+        - status
+        - createdAt
+
+    CreateTransferRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [simulation, document]
+        senderName:
+          type: string
+        senderIban:
+          type: string
+        senderBank:
+          type: string
+        receiverName:
+          type: string
+        receiverIban:
+          type: string
+        receiverBank:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        reference:
+          type: string
+        description:
+          type: string
+        transferDate:
+          type: string
+          format: date
+        estimatedArrival:
+          type: string
+          format: date
+      required:
+        - type
+        - senderName
+        - senderBank
+        - receiverName
+        - receiverBank
+        - amount
+        - currency
+
+    Transfer:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [simulation, document]
+        trackingCode:
+          type: string
+        trackingUrl:
+          type: string
+        senderName:
+          type: string
+        senderIban:
+          type: string
+        senderBank:
+          type: string
+        receiverName:
+          type: string
+        receiverIban:
+          type: string
+        receiverBank:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        reference:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [initiated, processing, completed, failed]
+        progress:
+          type: integer
+        transferDate:
+          type: string
+          format: date
+        estimatedArrival:
+          type: string
+          format: date
+        coinCost:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - type
+        - trackingCode
+        - trackingUrl
+        - senderName
+        - senderBank
+        - receiverName
+        - receiverBank
+        - amount
+        - currency
+        - status
+        - progress
+        - coinCost
+        - createdAt
+
+    TransferTracking:
+      type: object
+      properties:
+        trackingCode:
+          type: string
+        senderName:
+          type: string
+        senderBank:
+          type: string
+        receiverName:
+          type: string
+        receiverBank:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [initiated, processing, completed, failed]
+        progress:
+          type: integer
+        transferDate:
+          type: string
+          format: date
+        estimatedArrival:
+          type: string
+          format: date
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransferStep"
+      required:
+        - trackingCode
+        - senderName
+        - senderBank
+        - receiverName
+        - receiverBank
+        - amount
+        - currency
+        - status
+        - progress
+        - steps
+
+    TransferStep:
+      type: object
+      properties:
+        label:
+          type: string
+        description:
+          type: string
+        completed:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - label
+        - description
+        - completed

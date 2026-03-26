@@ -1,0 +1,31 @@
+packages:
+  "framer-motion": "For smooth page transitions and micro-interactions"
+  "recharts": "For dashboard transaction charts"
+  "date-fns": "For formatting dates in transaction history"
+  "clsx": "For conditional class names"
+  "tailwind-merge": "For merging tailwind classes safely"
+  "lucide-react": "For beautiful consistent icons"
+  "react-hook-form": "For robust form handling"
+  "@hookform/resolvers": "For zod validation integration"
+  "zod": "For form schemas"
+
+images:
+  - path: "artifacts/digitpro/public/images/hero-bg.png"
+    description: "Abstract dark professional fintech background, deep navy and indigo with subtle glowing geometric lines and light leaks, modern SaaS feel"
+    aspect_ratio: "16:9"
+  - path: "artifacts/digitpro/public/images/logo.png"
+    description: "Sleek modern minimalist tech logo mark for 'DigitPro', metallic electric blue on a fully transparent background, D letterform abstract"
+    aspect_ratio: "1:1"
+  - path: "artifacts/digitpro/public/images/template-business.png"
+    description: "Preview mockup of a dark modern business website landing page, high end corporate SaaS design"
+    aspect_ratio: "16:9"
+  - path: "artifacts/digitpro/public/images/template-portfolio.png"
+    description: "Preview mockup of a creative minimal portfolio website, dark mode, bold typography, sleek design"
+    aspect_ratio: "16:9"
+  - path: "artifacts/digitpro/public/images/template-ecommerce.png"
+    description: "Preview mockup of a premium fashion e-commerce storefront, dark luxury theme, product grid"
+    aspect_ratio: "16:9"
+
+notes:
+  - Using mocked data layer built into the UI components for an immediate realistic interactive mockup experience as requested, overriding missing backend endpoints.
+  - Using React Context for Auth and Coin balances to maintain state across page navigations.
